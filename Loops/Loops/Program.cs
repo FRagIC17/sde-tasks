@@ -4,7 +4,6 @@
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("##############");
             Console.WriteLine("Multiplication Table (1 to 10):\n");
             MultiplicationTable();
 
