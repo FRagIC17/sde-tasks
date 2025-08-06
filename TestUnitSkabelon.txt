@@ -1,0 +1,27 @@
+namespace LoopsTest
+{
+    public class LoopTest
+    {
+        [Fact]
+        public void (NameOfMethod)ExpectedOutput()
+        {
+            // Arrange
+            int expected = ;
+
+            // Act
+
+            int actual = ;
+
+            // Assert
+            Assert.Equal(expected, actual);
+        }
+    }
+}
+
+how to connect the unit test to the project:
+
+- right click on xUnitTest project (not solution or .cs file)
+
+- click on add project reference
+
+- add the project as reference

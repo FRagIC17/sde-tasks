@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36327.8 d17.14
+VisualStudioVersion = 17.14.36327.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Loops", "Loops\Loops.csproj", "{5ACC5F00-AE9B-414B-9A65-79CE5CEC0305}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopsTest", "LoopsTest\LoopsTest.csproj", "{BEE96904-6716-48FB-8975-8316BD861027}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{5ACC5F00-AE9B-414B-9A65-79CE5CEC0305}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5ACC5F00-AE9B-414B-9A65-79CE5CEC0305}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5ACC5F00-AE9B-414B-9A65-79CE5CEC0305}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BEE96904-6716-48FB-8975-8316BD861027}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BEE96904-6716-48FB-8975-8316BD861027}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BEE96904-6716-48FB-8975-8316BD861027}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BEE96904-6716-48FB-8975-8316BD861027}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
