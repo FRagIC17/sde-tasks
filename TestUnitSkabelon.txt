@@ -25,3 +25,7 @@ how to connect the unit test to the project:
 - click on add project reference
 
 - add the project as reference
+
+REMEMBER: make class public
+
+REMEMBER: Make the method public static

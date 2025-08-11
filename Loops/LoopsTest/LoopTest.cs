@@ -6,10 +6,10 @@ namespace LoopsTest
         public void ToThePowerOfNextNumberExpectedOutput()
         {
             // Arrange
-            int expected = ;
+            int expected = 3125;
 
             // Act
-            int actual = Loops.Program.ToThePowerOfNextNumber(-2, 3);
+            int actual = Loops.Program.ToThePowerOfNextNumber(3, 5);
 
             // Assert
             Assert.Equal(expected, actual);
