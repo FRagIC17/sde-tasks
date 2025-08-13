@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36327.8 d17.14
+VisualStudioVersion = 17.14.36327.8
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yatzy-spil", "yatzy-spil.csproj", "{702041F8-DE31-4992-BD16-F5072969E200}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Yatzy-spil-unittest", "Yatzy-spil-unittest\Yatzy-spil-unittest.csproj", "{9ED583E7-07E7-4795-B4CF-C7C236AA32BA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "yatzy-spil-unittest", "yatzy-spil-unittest\yatzy-spil-unittest.csproj", "{749E88E2-29F8-4E50-9B94-6011E566104A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{702041F8-DE31-4992-BD16-F5072969E200}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{702041F8-DE31-4992-BD16-F5072969E200}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{702041F8-DE31-4992-BD16-F5072969E200}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9ED583E7-07E7-4795-B4CF-C7C236AA32BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9ED583E7-07E7-4795-B4CF-C7C236AA32BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9ED583E7-07E7-4795-B4CF-C7C236AA32BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9ED583E7-07E7-4795-B4CF-C7C236AA32BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{749E88E2-29F8-4E50-9B94-6011E566104A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{749E88E2-29F8-4E50-9B94-6011E566104A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{749E88E2-29F8-4E50-9B94-6011E566104A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{749E88E2-29F8-4E50-9B94-6011E566104A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

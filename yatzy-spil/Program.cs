@@ -1,13 +1,20 @@
-﻿using System.Security.Cryptography.X509Certificates;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace yatzy_spil
 {
-    internal class Program
+    public class Program
     {
         public static Player[] playersArray;
+        public static string[] categories = new string[]
+        {
+            "Ones", "Twos", "Threes", "Fours", "Fives", "Sixes",
+            "One Pair", "Two Pairs", "Three of a Kind", "Four of a Kind",
+            "Small Straight", "Large Straight", "Full House", "Chance", "Yatzy"
+        };
 
-        //husk og lav sådan at spillere for de mulige pointscoringer hver runde for hvad der er muligt
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.WriteLine("Yatzy spil");
             Console.WriteLine("-------------------");
@@ -18,13 +25,10 @@ namespace yatzy_spil
 
         public static void CreatePlayers()
         {
-            Console.Write("vælg antal spillere: ");
-            String numberOfPlayers = Console.ReadLine();
-
-            int players = 0;
-            if (numberOfPlayers == null || !int.TryParse(numberOfPlayers, out players) || players < 1 || players > 6)
+            Console.Write("Vælg antal spillere (2-6): ");
+            if (!int.TryParse(Console.ReadLine(), out int players) || players < 2 || players > 6)
             {
-                Console.WriteLine("Ugyldigt antal spillere. Prøv igen.");
+                Console.WriteLine("Ugyldigt antal spillere. Afslutter.");
                 Environment.Exit(0);
             }
 
@@ -33,139 +37,170 @@ namespace yatzy_spil
             {
                 Console.Write($"Indtast navn for spiller {i + 1}: ");
                 string playerName = Console.ReadLine();
-                if (string.IsNullOrWhiteSpace(playerName))
-                {
-                    Console.WriteLine("Navn kan ikke være tomt. Prøv igen.");
-                    i--;
-                    continue;
-                }
-                playersArray[i] = new Player(playerName);
+                if (string.IsNullOrWhiteSpace(playerName)) playerName = $"Spiller{i + 1}";
+                playersArray[i] = new Player(playerName, categories.Length);
             }
         }
 
         public static void PlayGame()
         {
-            Console.WriteLine("Spillet starter nu!");
-
-            for (int currentPlayerIndex = 0; currentPlayerIndex < playersArray.Length; currentPlayerIndex++)
+            for (int round = 0; round < categories.Length; round++)
             {
-                Player currentPlayer = playersArray[currentPlayerIndex];
-                Console.WriteLine($"Tur for {currentPlayer.name}");
+                Console.WriteLine($"\n--- Runde {round + 1} af {categories.Length} ---");
 
-                int unselectedDice = 5; // Start with 5 dice for each player
-
-                for (int turn = 1; turn <= 3 && unselectedDice > 0; turn++)
+                foreach (Player currentPlayer in playersArray)
                 {
-                    Console.WriteLine($"Turn {turn} for {currentPlayer.name}");
-                    DiceRolls(unselectedDice);
+                    Console.WriteLine($"\n{currentPlayer.Name}'s tur:");
+                    int[] dice = new int[5];
+                    bool[] held = new bool[5];
 
-                    bool valid = false;
-                    List<int> selectedIndices = new List<int>();
-
-                    while (!valid)
+                    for (int rollNum = 1; rollNum <= 3; rollNum++)
                     {
-                        Console.Write("Vælg hvilke terninger at beholde (f.eks. 1,3,5 eller 0 for at slå igen): ");
-                        string input = Console.ReadLine();
-                        if (input.Trim() == "0")
+                        RollDice(dice, held);
+
+                        // Build a list of unheld dice indices for mapping
+                        var unheldIndices = new List<int>();
+                        for (int i = 0; i < dice.Length; i++)
                         {
-                            Console.WriteLine("Du har valgt at slå alle terninger igen.");
-                            valid = true;
-                            selectedIndices.Clear();
-                            continue;
+                            if (!held[i])
+                                unheldIndices.Add(i);
                         }
 
-                        string[] inputArray = input.Split(',');
-                        selectedIndices.Clear();
-                        valid = true;
-
-                        foreach (var item in inputArray)
+                        // Show only dice that are not held, but display as 1, 2, 3, ...
+                        Console.WriteLine($"Kast {rollNum}:");
+                        for (int i = 0; i < unheldIndices.Count; i++)
                         {
-                            if (int.TryParse(item.Trim(), out int idx) && idx >= 1 && idx <= unselectedDice)
+                            int dieIdx = unheldIndices[i];
+                            Console.WriteLine($"terning {i + 1} : {dice[dieIdx]}");
+                        }
+
+                        if (rollNum < 4 && unheldIndices.Count > 0)
+                        {
+                            Console.Write("Indtast hvilke terninger at beholde (f.eks. 1,3,5 eller 0 for ingen): ");
+                            string input = Console.ReadLine();
+                            if (input.Trim() == "0") continue;
+
+                            foreach (var part in input.Split(','))
                             {
-                                if (!selectedIndices.Contains(idx))
-                                    selectedIndices.Add(idx);
+                                if (int.TryParse(part.Trim(), out int idx) && idx >= 1 && idx <= unheldIndices.Count)
+                                {
+                                    held[unheldIndices[idx - 1]] = true;
+                                }
                             }
-                            else
+
+                            // Stop rolling if all dice are held
+                            if (held.All(h => h))
                             {
-                                valid = false;
+                                Console.WriteLine("Alle terninger er valgt. Slutter kast.");
                                 break;
                             }
                         }
-
-                        if (!valid || selectedIndices.Count == 0)
-                        {
-                            Console.WriteLine("Ugyldigt valg. Prøv igen.");
-                        }
                     }
 
-                    if (selectedIndices.Count > 0)
+
+
+                    // Choose category
+                    Console.WriteLine("Vælg en kategori:");
+                    for (int i = 0; i < categories.Length; i++)
                     {
-                        unselectedDice -= selectedIndices.Count;
-                        currentPlayer.AddScore(selectedIndices.Count);
-                        Console.WriteLine($"{currentPlayer.name} score: {currentPlayer.score}");
+                        if (!currentPlayer.CategoryUsed[i])
+                            Console.WriteLine($"{i + 1}. {categories[i]}");
                     }
 
-                    if (unselectedDice == 0)
+                    int choice;
+                    while (!int.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > categories.Length || currentPlayer.CategoryUsed[choice - 1])
                     {
-                        Console.WriteLine("Alle terninger er valgt. Næste spillers tur.");
-                        break;
+                        Console.WriteLine("Ugyldigt valg. Prøv igen:");
                     }
+
+                    int score = CalculateScore(dice, choice - 1);
+                    currentPlayer.Score[choice - 1] = score;
+                    currentPlayer.CategoryUsed[choice - 1] = true;
+
+                    Console.WriteLine($"{currentPlayer.Name} fik {score} point i {categories[choice - 1]}");
                 }
-                Console.WriteLine("-------------------");
             }
-            Console.WriteLine("Spillet er slut! Slutstilling:");
+
+            Console.WriteLine("\n--- Slutstilling ---");
             foreach (var player in playersArray)
             {
-                Console.WriteLine(player.ToString());
+                int total = player.Score.Sum();
+                Console.WriteLine($"{player.Name} - Total: {total}");
+            }
+
+            var winner = playersArray.OrderByDescending(p => p.Score.Sum()).First();
+            Console.WriteLine($"\nVinderen er {winner.Name} med {winner.Score.Sum()} point!");
+        }
+
+        public static void RollDice(int[] dice, bool[] held)
+        {
+            Random rand = new Random();
+            for (int i = 0; i < dice.Length; i++)
+            {
+                if (!held[i])
+                    dice[i] = rand.Next(1, 7);
             }
         }
 
-        public static void DiceRolls(int unselectedDice)
+        public static int CalculateScore(int[] dice, int categoryIndex)
         {
-            dice d = new dice();
-            int[] diceRolls = new int[5];
-            for (int i = 0; i < unselectedDice; i++)
+            var counts = dice.GroupBy(x => x).ToDictionary(g => g.Key, g => g.Count());
+            int score = 0;
+
+            switch (categoryIndex)
             {
-                diceRolls[i] = d.roll();
-                Console.WriteLine($"Terning {i + 1}: {diceRolls[i]}");
+                case 0: score = counts.ContainsKey(1) ? counts[1] * 1 : 0; break;
+                case 1: score = counts.ContainsKey(2) ? counts[2] * 2 : 0; break;
+                case 2: score = counts.ContainsKey(3) ? counts[3] * 3 : 0; break;
+                case 3: score = counts.ContainsKey(4) ? counts[4] * 4 : 0; break;
+                case 4: score = counts.ContainsKey(5) ? counts[5] * 5 : 0; break;
+                case 5: score = counts.ContainsKey(6) ? counts[6] * 6 : 0; break;
+                case 6: // One Pair
+                    score = counts.Where(c => c.Value >= 2).OrderByDescending(c => c.Key).Select(c => c.Key * 2).FirstOrDefault();
+                    break;
+                case 7: // Two Pairs
+                    var pairs = counts.Where(c => c.Value >= 2).OrderByDescending(c => c.Key).Take(2).ToList();
+                    if (pairs.Count == 2) score = pairs.Sum(p => p.Key * 2);
+                    break;
+                case 8: // Three of a Kind
+                    score = counts.Where(c => c.Value >= 3).Select(c => c.Key * 3).FirstOrDefault();
+                    break;
+                case 9: // Four of a Kind
+                    score = counts.Where(c => c.Value >= 4).Select(c => c.Key * 4).FirstOrDefault();
+                    break;
+                case 10: // Small Straight (1-5)
+                    score = dice.OrderBy(x => x).SequenceEqual(new[] { 1, 2, 3, 4, 5 }) ? 15 : 0;
+                    break;
+                case 11: // Large Straight (2-6)
+                    score = dice.OrderBy(x => x).SequenceEqual(new[] { 2, 3, 4, 5, 6 }) ? 20 : 0;
+                    break;
+                case 12: // Full House
+                    if (counts.Values.Contains(3) && counts.Values.Contains(2))
+                        score = dice.Sum();
+                    break;
+                case 13: // Chance
+                    score = dice.Sum();
+                    break;
+                case 14: // Yatzy
+                    score = counts.Values.Contains(5) ? 50 : 0;
+                    break;
             }
-            Console.WriteLine("-------------------");
+
+            return score;
         }
     }
 
     public class Player
     {
-        public string name { get; set; }
-        public int score { get; set; }
-        public Player(string name)
-        {
-            this.name = name;
-            this.score = 0;
-        }
+        public string Name { get; set; }
+        public int[] Score { get; set; }
+        public bool[] CategoryUsed { get; set; }
 
-        public void AddScore(int points)
+        public Player(string name, int categoryCount)
         {
-            score += points;
-        }
-
-        public void ResetScore()
-        {
-            score = 0;
-        }
-
-        public override string ToString()
-        {
-            return $"{name} - Score: {score}";
-        }
-    }
-
-
-    public class dice
-    {
-        public int roll()
-        {
-            Random random = new Random();
-            return random.Next(1, 7);
+            Name = name;
+            Score = new int[categoryCount];
+            CategoryUsed = new bool[categoryCount];
         }
     }
 }
