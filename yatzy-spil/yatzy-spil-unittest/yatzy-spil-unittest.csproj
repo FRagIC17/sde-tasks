@@ -1,3 +1,4 @@
+<!-- 
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -25,7 +26,34 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-</Project>xUnit test framework <!-- 
+</Project>
+-->
 
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<IsPackable>false</IsPackable>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- xUnit test framework -->
+		<PackageReference Include="xunit" Version="2.5.3" />
+
+		<!-- xUnit adapter for Visual Studio and dotnet test discovery -->
+		<PackageReference Include="xunit.runner.visualstudio" Version="2.6.2">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+
+		<!-- Required for test execution -->
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<!-- Reference your main project -->
 		<ProjectReference Include="..\yatzy-spil.csproj" />
+		<ProjectReference Include="..\yatzy-spil\yatzy-spil.csproj" />
+	</ItemGroup>
 
+</Project>

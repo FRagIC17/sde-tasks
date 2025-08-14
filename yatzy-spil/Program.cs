@@ -182,7 +182,7 @@ namespace yatzy_spil
                     score = dice.Sum();
                     break;
                 case 14: // Yatzy
-                    score = counts.Values.Contains(5) ? 50 : 0;
+                    score = counts.Values.Contains(5) ? dice.Sum() + 50 : 0;
                     break;
             }
 
