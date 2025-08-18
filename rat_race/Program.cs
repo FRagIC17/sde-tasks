@@ -15,7 +15,6 @@ namespace rat_race
             while (!int.TryParse(Console.ReadLine(), out playerCount) || playerCount < 1 || playerCount > 6)
             {
                 Console.Write("Ugyldigt input. Indtast et tal mellem 1 og 6: ");
-
             }
 
             // Opret bane
@@ -39,81 +38,118 @@ namespace rat_race
                 RaceManager.CreateRat("Whiskers")
             };
 
-            // Opret race
-            Race race = RaceManager.CreateRace(1, rats, track);
-
-            // Vis rotter
-            Console.WriteLine("\nTilgængelige rotter:");
-            for (int i = 0; i < rats.Count; i++)
+            int raceNumber = 1;
+            while (players.Count > 0)
             {
-                Console.WriteLine($"{i + 1}. {rats[i].Name}");
-            }
-
-            // Betting fase
-            Console.WriteLine("\n--- Placer dine bets ---");
-            foreach (var player in players)
-            {
-                Console.WriteLine($"\n{player.playerName}, du har {player.Money} kr.");
-                Console.Write("Vælg rotte (indtast nummer): ");
-                int ratChoice;
-                while (!int.TryParse(Console.ReadLine(), out ratChoice) || ratChoice < 1 || ratChoice > rats.Count)
+                // Reset rotter til ny race
+                foreach (var rat in rats)
                 {
-                    Console.Write("Ugyldigt valg. Prøv igen: ");
+                    rat.ResetRat();
                 }
 
-                Rat chosenRat = rats[ratChoice - 1];
+                // Opret race
+                Race race = RaceManager.CreateRace(raceNumber, rats, track);
 
-                Console.Write($"Hvor meget vil du satse (maks {player.Money}): ");
-                int amount;
-                while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0 || amount > player.Money)
+                // Vis rotter
+                Console.WriteLine("\nTilgængelige rotter:");
+                for (int i = 0; i < rats.Count; i++)
                 {
-                    Console.Write("Ugyldigt beløb. Prøv igen: ");
+                    Console.WriteLine($"{i + 1}. {rats[i].Name}");
                 }
 
-                // Opret bet
-                Bet bet = new Bet
+                // Betting fase
+                Console.WriteLine("\n--- Placer dine bets ---");
+                foreach (var player in players.ToList())
                 {
-                    Player = player,
-                    Race = race,
-                    Rat = chosenRat,
-                    Money = amount,
-                    IsWinningBet = false
-                };
+                    if (player.Money <= 0)
+                        continue;
 
-                player.Bets.Add(bet);
-                player.Money -= amount; // træk penge med det samme
-                race.Bets.Add(bet);
-            }
+                    Console.WriteLine($"\n{player.playerName}, du har {player.Money} kr.");
+                    Console.Write("Vælg rotte (indtast nummer): ");
+                    int ratChoice;
+                    while (!int.TryParse(Console.ReadLine(), out ratChoice) || ratChoice < 1 || ratChoice > rats.Count)
+                    {
+                        Console.Write("Ugyldigt valg. Prøv igen: ");
+                    }
 
-            Console.WriteLine("\n--- Start race ---\n");
+                    Rat chosenRat = rats[ratChoice - 1];
 
-            // Simuler racet
-            RaceManager.ConductRace(race);
+                    Console.Write($"Hvor meget vil du satse (maks {player.Money}): ");
+                    int amount;
+                    while (!int.TryParse(Console.ReadLine(), out amount) || amount <= 0 || amount > player.Money)
+                    {
+                        Console.Write("Ugyldigt beløb. Prøv igen: ");
+                    }
 
-            // Vis race log
-            Console.WriteLine(RaceManager.ViewRaceReport(race));
+                    // Opret bet
+                    Bet bet = new Bet
+                    {
+                        Player = player,
+                        Race = race,
+                        Rat = chosenRat,
+                        Money = amount,
+                        IsWinningBet = false
+                    };
 
-            // Find vinder
-            Rat winner = race.GetWinner();
-            Console.WriteLine($"\nVinderen er: {winner.Name}!");
-
-            // Udbetal gevinster
-            foreach (var bet in race.Bets)
-            {
-                if (bet.Rat == winner)
-                {
-                    bet.IsWinningBet = true;
-                    int winnings = bet.Money * 2;
-                    bet.Player.Money += winnings;
-                    Console.WriteLine($"{bet.Player.playerName} vinder {winnings} kr.!");
+                    player.Bets.Add(bet);
+                    player.Money -= amount; // træk penge med det samme
+                    race.Bets.Add(bet);
                 }
-            }
 
-            // Slutresultat
-            Console.WriteLine("\n--- Slutresultat ---");
-            foreach (var player in players)
-            {
-                Console.WriteLine($"{player.playerName}: {player.Money} kr.");
+                Console.WriteLine("\n--- Start race ---\n");
+
+                // Simuler racet
+                RaceManager.ConductRace(race);
+
+                // Vis race log
+                Console.WriteLine(RaceManager.ViewRaceReport(race));
+
+                // Find vinder
+                Rat winner = race.GetWinner();
+                Console.WriteLine($"\nVinderen er: {winner.Name}!");
+
+                // Udbetal gevinster
+                foreach (var bet in race.Bets)
+                {
+                    if (bet.Rat == winner)
+                    {
+                        bet.IsWinningBet = true;
+                        int winnings = bet.Money * 2;
+                        bet.Player.Money += winnings;
+                        Console.WriteLine($"{bet.Player.playerName} vinder {winnings} kr.!");
+                    }
+                }
+
+                // Fjern spillere uden penge
+                int beforeCount = players.Count;
+                players = players.Where(p => p.Money > 0).ToList();
+                int afterCount = players.Count;
+                if (beforeCount != afterCount)
+                {
+                    Console.WriteLine("\nFølgende spillere er ude af spillet:");
+                    foreach (var p in players.Where(p => p.Money <= 0))
+                    {
+                        Console.WriteLine($"{p.playerName}");
+                    }
+                }
+
+                // Slutresultat for denne runde
+                Console.WriteLine("\n--- Slutresultat ---");
+                foreach (var player in players)
+                {
+                    Console.WriteLine($"{player.playerName}: {player.Money} kr.");
+                }
+
+                if (players.Count == 0)
+                {
+                    Console.WriteLine("\nAlle spillere har mistet deres penge. Spillet er slut!");
+                    break;
+                }
+
+                raceNumber++;
+                Console.WriteLine("\nTryk på en tast for at starte næste race...");
+                Console.ReadKey();
+                Console.Clear();
             }
         }
     }
